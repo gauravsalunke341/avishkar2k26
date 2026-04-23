@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodVibe | Premium Mood-Based Music & Quote Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --success: #00cec9;
+            --danger: #d63031;
+            --warning: #fdcb6e;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* --- LOADING ANIMATION --- */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: var(--transition);
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- HEADER & NAVBAR --- */
+        header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo i {
+            font-size: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--dark);
+            border: 2px solid var(--primary);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            text-align: center;
+            padding: 5rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #636e72;
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .hero-image {
+            max-width: 100%;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+        }
+
+        /* --- MOOD SELECTOR --- */
+        .mood-section {
+            padding: 4rem 5%;
+            text-align: center;
+            background: white;
+        }
+
+        .mood-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary);
+        }
+
+        .mood-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto 3rem;
+        }
+
+        .mood-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .mood-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .mood-card.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .mood-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .mood-label {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* --- CONTENT DISPLAY --- */
+        .content-section {
+            padding: 4rem 5%;
+            background: #f8f9fa;
+        }
+
+        .content-card {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quote-box {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-box::before {
+            content: '"';
+            font-size: 8rem;
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            opacity: 0.1;
+            color: var(--primary);
+        }
+
+        .quote-text {
+            font-size: 1.5rem;
+            font-style: italic;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .quote-author {
+            font-weight: 600;
+            text-align: right;
+            color: var(--primary);
+        }
+
+        .music-player {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .music-cover {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .music-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .music-info p {
+            color: #636e72;
+        }
+
+        .play-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .play-btn:hover {
+            background: #5a4ec4;
+            transform: translateY(-2px);
+        }
+
+        /* --- SOCIAL SHARE --- */
+        .social-share {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .facebook { background: #3b5998; }
+        .twitter { background: #1da1f2; }
+        .whatsapp { background: #25d366; }
+        .instagram { background: #e1306c; }
+
+        .social-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        /* --- SUBSCRIPTION SECTION --- */
+        .subscription {
+            padding: 4rem 5%;
+            text-align: center;
+            background: white;
+        }
+
+        .subscription h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .subscription p {
+            color: #636e72;
+            margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .pricing-card.popular {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        .plan-features li {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .plan-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .plan-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .plan-btn.secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 5% 1rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto 2rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .footer-logo i {
+            font-size: 2rem;
+        }
+
+        .footer-text {
+            color: #b2bec3;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #b2bec3;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-icons a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-icons a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #b2bec3;
+            font-size: 0.9rem;
+        }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .mood-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .pricing-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mood-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOADER -->
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <i class="fas fa-music"></i>
+                <span>MoodVibe</span>
+            </div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#about">About</a>
+            </div>
+            <div class="auth-buttons">
+                <a href="#" class="btn btn-secondary">Login</a>
+                <a href="#" class="btn btn-primary">Sign Up</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero" id="home">
+        <h1>Discover Your Perfect Mood 🎵</h1>
+        <p>Get personalized music recommendations and inspiring quotes based on your current mood. Join thousands of users who are transforming their emotions into art!</p>
+        <div class="hero-buttons">
+            <a href="#moods" class="btn btn-primary">Get Started <i class="fas fa-arrow-right"></i></a>
+            <a href="#pricing" class="btn btn-secondary">See Pricing</a>
+        </div>
+        <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="MoodVibe Hero Image" class="hero-image">
+    </section>
+
+    <!-- MOOD SELECTOR -->
+    <section class="mood-section" id="moods">
+        <h2>How Are You Feeling Today? 😊</h2>
+        <div class="mood-grid">
+            <div class="mood-card active" data-mood="happy">
+                <div class="mood-emoji">😊</div>
+                <div class="mood-label">Happy</div>
+            </div>
+            <div class="mood-card" data-mood="sad">
+                <div class="mood-emoji">😢</div>
+                <div class="mood-label">Sad</div>
+            </div>
+            <div class="mood-card" data-mood="focus">
+                <div class="mood-emoji">🧠</div>
+                <div class="mood-label">Focus</div>
+            </div>
+            <div class="mood-card" data-mood="breakup">
+                <div class="mood-emoji">💔</div>
+                <div class="mood-label">Breakup</div>
+            </div>
+            <div class="mood-card" data-mood="gym">
+                <div class="mood-emoji">💪</div>
+                <div class="mood-label">Gym</div>
+            </div>
+            <div class="mood-card" data-mood="relax">
+                <div class="mood-emoji">😌</div>
+                <div class="mood-label">Relax</div>
+            </div>
+            <div class="mood-card" data-mood="motivation">
+                <div class="mood-emoji">🔥</div>
+                <div class="mood-label">Motivation</div>
+            </div>
+            <div class="mood-card" data-mood="sleep">
+                <div class="mood-emoji">😴</div>
+                <div class="mood-label">Sleep</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTENT DISPLAY -->
+    <section class="content-section">
+        <div class="content-card">
+            <div class="quote-box">
+                <div class="quote-text" id="quote-text">Select a mood to get started!</div>
+                <div class="quote-author" id="quote-author"></div>
+            </div>
+
+            <div class="music-player">
+                <div class="music-cover" id="music-cover">🎵</div>
+                <div class="music-info">
+                    <h3 id="song-title">Song Title</h3>
+                    <p id="song-artist">Artist Name</p>
+                </div>
+                <a href="#" target="_blank" class="play-btn" id="play-link">
+                    <i class="fas fa-play"></i> Play on YouTube
+                </a>
+            </div>
+
+            <div class="social-share">
+                <div class="social-btn facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </div>
+                <div class="social-btn twitter">
+                    <i class="fab fa-twitter"></i>
+                </div>
+                <div class="social-btn whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <div class="social-btn instagram">
+                    <i class="fab fa-instagram"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SUBSCRIPTION SECTION -->
+    <section class="subscription" id="pricing">
+        <h2>Choose Your Plan 💎</h2>
+        <p>Join our premium community to unlock exclusive features, unlimited moods, and ad-free experience. Your perfect vibe awaits!</p>
+
+        <div class="pricing-cards">
+            <div class="pricing-card">
+                <div class="plan-name">Free Trial</div>
+                <div class="plan-price">$0 <span style="font-size: 1rem; font-weight: 400;">/ forever</span></div>
+                <ul class="plan-features">
+                    <li>3 Mood Selections</li>
+                    <li>Basic Quote & Music</li>
+                    <li>Limited Social Sharing</li>
+                    <li>Ads Supported</li>
+                </ul>
+                <button class="plan-btn secondary">Get Started</button>
+            </div>
+
+            <div class="pricing-card popular">
+                <div class="plan-name">Premium</div>
+                <div class="plan-price">$4.99 <span style="font-size: 1rem; font-weight: 400;">/ month</span></div>
+                <ul class="plan-features">
+                    <li>Unlimited Moods</li>
+                    <li>Premium Quotes & Music</li>
+                    <li>Full Social Sharing</li>
+                    <li>Ad-Free Experience</li>
+                    <li>Priority Support</li>
+                    <li>Exclusive Content</li>
+                </ul>
+                <button class="plan-btn primary">Subscribe Now</button>
+            </div>
+
+            <div class="pricing-card">
+                <div class="plan-name">Lifetime</div>
+                <div class="plan-price">$29.99 <span style="font-size: 1rem; font-weight: 400;">/ one time</span></div>
+                <ul class="plan-features">
+                    <li>Lifetime Access</li>
+                    <li>All Premium Features</li>
+                    <li>All Future Updates</li>
+                    <li>VIP Support</li>
+                    <li>Exclusive Badge</li>
+                </ul>
+                <button class="plan-btn secondary">Get Lifetime</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-music"></i>
+                <span>MoodVibe</span>
+            </div>
+            <p class="footer-text">Discover your perfect mood with personalized music and inspiring quotes. Join our community today!</p>
+
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#moods">Moods</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                    <li><a href="#">Refund Policy</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h3>Connect With Us</h3>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="copyright">
+            <p>© 2023 MoodVibe. All rights reserved.</p>
+            <p style="font-size: 0.8rem; margin-top: 1rem;">Made with ❤️ for the Vibe Sprint Competition</p>
+        </div>
+    </footer>
+
+    <script>
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loader
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 2000);
+
+            // Mood data
+            const moodData = {
+                happy: {
+                    quotes: [
+                        { text: "Happiness is not something ready-made. It comes from your own actions.", author: "Dalai Lama" },
+                        { text: "The purpose of our lives is to be happy.", author: "Dalai Lama" },
+                        { text: "Happiness is a direction, not a place.", author: "Sydney J. Harris" },
+                        { text: "The most wasted of all days is one without laughter.", author: "E.E. Cummings" },
+                        { text: "Be happy for this moment. This moment is your life.", author: "Omar Khayyam" }
+                    ],
+                    songs: [
+                        { title: "Happy", artist: "Pharrell Williams" },
+                        { title: "Can't Stop the Feeling!", artist: "Justin Timberlake" },
+                        { title: "Walking on Sunshine", artist: "Katrina & The Waves" },
+                        { title: "Good Vibrations", artist: "The Beach Boys" },
+                        { title: "Three Little Birds", artist: "Bob Marley" }
+                    ],
+                    cover: "😊"
+                },
+                sad: {
+                    quotes: [
+                        { text: "The way sadness works is one of the strange riddles of the world.", author: "Lemony Snicket" },
+                        { text: "Sadness flies away on the wings of time.", author: "Jean de La Fontaine" },
+                        { text: "Tears are words the heart can't express.", author: "Gerard Way" },
+                        { text: "The deeper the sorrow, the greater the capacity for joy.", author: "Kahlil Gibran" },
+                        { text: "Sadness is but a wall between two gardens.", author: "Kahlil Gibran" }
+                    ],
+                    songs: [
+                        { title: "Someone Like You", artist: "Adele" },
+                        { title: "Fix You", artist: "Coldplay" },
+                        { title: "The Night We Met", artist: "Lord Huron" },
+                        { title: "Hurt", artist: "Johnny Cash" },
+                        { title: "Skinny Love", artist: "Bon Iver" }
+                    ],
+                    cover: "😢"
+                },
+                focus: {
+                    quotes: [
+                        { text: "The successful warrior is the average man, with laser-like focus.", author: "Bruce Lee" },
+                        { text: "Focus on being productive instead of busy.", author: "Tim Ferriss" },
+                        { text: "Concentrate all your thoughts upon the work at hand.", author: "Alexander Graham Bell" },
+                        { text: "Where focus goes, energy flows.", author: "Tony Robbins" },
+                        { text: "The ability to focus is the key to success.", author: "Steve Jobs" }
+                    ],
+                    songs: [
+                        { title: "Time", artist: "Hans Zimmer" },
+                        { title: "Weightless", artist: "Marconi Union" },
+                        { title: "Experience", artist: "Ludovico Einaudi" },
+                        { title: "Strobe", artist: "Deadmau5" },
+                        { title: "Nuvole Bianche", artist: "Ludovico Einaudi" }
+                    ],
+                    cover: "🧠"
+                },
+                breakup: {
+                    quotes: [
+                        { text: "Sometimes good things fall apart so better things can fall together.", author: "Marilyn Monroe" },
+                        { text: "The hottest love has the coldest end.", author: "Socrates" },
+                        { text: "Don't cry because it's over, smile because it happened.", author: "Dr. Seuss" },
+                        { text: "What feels like the end is often the beginning.", author: "Unknown" },
+                        { text: "Letting go is the hardest act of love.", author: "Unknown" }
+                    ],
+                    songs: [
+                        { title: "We Are Never Ever Getting Back Together", artist: "Taylor Swift" },
+                        { title: "Since U Been Gone", artist: "Kelly Clarkson" },
+                        { title: "Thank U, Next", artist: "Ariana Grande" },
+                        { title: "Irreplaceable", artist: "Beyoncé" },
+                        { title: "Someone You Loved", artist: "Lewis Capaldi" }
+                    ],
+                    cover: "💔"
+                },
+                gym: {
+                    quotes: [
+                        { text: "No pain, no gain.", author: "Jane Fonda" },
+                        { text: "The only bad workout is the one that didn't happen.", author: "Unknown" },
+                        { text: "Strength does not come from the body. It comes from the will.", author: "Unknown" },
+                        { text: "The body achieves what the mind believes.", author: "Napoleon Hill" },
+                        { text: "Push yourself because no one else is going to do it for you.", author: "Unknown" }
+                    ],
+                    songs: [
+                        { title: "Eye of the Tiger", artist: "Survivor" },
+                        { title: "Till I Collapse", artist: "Eminem" },
+                        { title: "Stronger", artist: "Kanye West" },
+                        { title: "Thunderstruck", artist: "AC/DC" },
+                        { title: "Lose Yourself", artist: "Eminem" }
+                    ],
+                    cover: "💪"
+                },
+                relax: {
+                    quotes: [
+                        { text: "Peace comes from within. Do not seek it without.", author: "Buddha" },
+                        { text: "Sometimes the most productive thing you can do is relax.", author: "Mark Black" },
+                        { text: "Calm mind brings inner strength and self-confidence.", author: "Dalai Lama" }
+                    ],
+                    songs: [
+                        { title: "Weightless", artist: "Marconi Union" },
+                        { title: "Clair de Lune", artist: "Debussy" },
+                        { title: "Spiegel im Spiegel", artist: "Arvo Pärt" }
+                    ],
+                    cover: "😌"
+                },
+                motivation: {
+                    quotes: [
+                        { text: "Success is no accident. It is hard work, perseverance, learning, studying, sacrifice and most of all, love of what you are doing.", author: "Pelé" },
+                        { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+                        { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" }
+                    ],
+                    songs: [
+                        { title: "Hall of Fame", artist: "The Script" },
+                        { title: "Stronger", artist: "Kelly Clarkson" },
+                        { title: "Unstoppable", artist: "Sia" }
+                    ],
+                    cover: "🔥"
+                },
+                sleep: {
+                    quotes: [
+                        { text: "Sleep is the best meditation.", author: "Dalai Lama" },
+                        { text: "A well-spent day brings happy sleep.", author: "Leonardo da Vinci" }
+                    ],
+                    songs: [
+                        { title: "Weightless", artist: "Marconi Union" },
+                        { title: "Dream", artist: "Prism" }
+                    ],
+                    cover: "😴"
+                }
+            };
+
+            // DOM Elements
+            const moodCards = document.querySelectorAll('.mood-card');
+            const quoteText = document.getElementById('quote-text');
+            const quoteAuthor = document.getElementById('quote-author');
+            const musicCover = document.getElementById('music-cover');
+            const songTitle = document.getElementById('song-title');
+            const songArtist = document.getElementById('song-artist');
+            const playLink = document.getElementById('play-link');
+            const socialBtns = document.querySelectorAll('.social-btn');
+
+            // Current mood
+            let currentMood = 'happy';
+
+            // Select random item from array
+            function getRandomItem(array) {
+                return array[Math.floor(Math.random() * array.length)];
+            }
+
+            // Generate content based on mood
+            function generateContent(mood) {
+                // Update active mood card
+                moodCards.forEach(card => card.classList.remove('active'));
+                document.querySelector(`.mood-card[data-mood="${mood}"]`).classList.add('active');
+                currentMood = mood;
+
+                // Get data for current mood
+                const data = moodData[mood];
+                const randomQuote = getRandomItem(data.quotes);
+                const randomSong = getRandomItem(data.songs);
+
+                // Update quote
+                quoteText.textContent = `"${randomQuote.text}"`;
+                quoteAuthor.textContent = randomQuote.author;
+
+                // Update music
+                musicCover.textContent = data.cover;
+                songTitle.textContent = randomSong.title;
+                songArtist.textContent = randomSong.artist;
+
+                // Update YouTube search link
+                const searchQuery = `https://www.youtube.com/results?search_query=${encodeURIComponent(randomSong.title + " " + randomSong.artist + " official audio")}`;
+                playLink.href = searchQuery;
+
+                // Update social share links
+                updateSocialLinks(mood, randomQuote.text, randomSong.title, randomSong.artist);
+            }
+
+            // Update social media share links
+            function updateSocialLinks(mood, quote, song, artist) {
+                const baseUrl = window.location.href.split('#')[0];
+                const shareText = `Check out my ${mood} mood playlist and quote! 🎵\n\nQuote: "${quote}"\n\nSong: ${song} by ${artist}\n\nGenerated with MoodVibe 💎`;
+
+                // Facebook
+                socialBtns[0].parentElement.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(baseUrl)}&quote=${encodeURIComponent(shareText)}`;
+
+                // Twitter
+                socialBtns[1].parentElement.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+
+                // WhatsApp
+                socialBtns[2].parentElement.href = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+
+                // Instagram (note: requires app to work properly)
+                socialBtns[3].parentElement.href = `https://www.instagram.com/?text=${encodeURIComponent(shareText)}`;
+            }
+
+            // Event listeners for mood cards
+            moodCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const mood = this.getAttribute('data-mood');
+                    generateContent(mood);
+                });
+            });
+
+            // Initialize with happy mood
+            generateContent('happy');
+
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Show notification when content is generated
+            function showNotification(message) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--primary);
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                    z-index: 1000;
+                    animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+                `;
+
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                // Add keyframes for animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes fadeOut {
+                        from { opacity: 1; }
+                        to { opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+
+                setTimeout(() => {
+                    notification.remove();
+                    style.remove();
+                }, 3000);
+            }
+
+            // Show welcome notification
+            setTimeout(() => {
+                showNotification('Welcome to MoodVibe! Select a mood to get started 🎵');
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
